@@ -4,6 +4,8 @@ from engine.cabron_abierto import CabronAbierto
 from engine.acople_pintubular import AcoplePintubular
 from engine.pickup_tubular import PickupTubular
 from engine.tubular_pendulando import TubularPendulando
+from engine.zona_riesgo_pickup_tubular import zona_riesgo_pickup_tubular
+from engine.mano_safata import AcoplePintubularManoSafata
 
 class RiskEngine:
     def __init__(self, cfg):
@@ -13,7 +15,9 @@ class RiskEngine:
             CabronAbierto(cfg),
             PickupTubular(cfg),
             TubularPendulando(cfg),
-            AcoplePintubular(cfg)
+            AcoplePintubular(cfg),
+            zona_riesgo_pickup_tubular(cfg),
+            AcoplePintubularManoSafata(cfg)
         ]
 
     def process(self, det_obj, res_pose, frame=None):

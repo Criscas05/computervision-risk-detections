@@ -1,0 +1,45 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  # --- Servicio de Detección de Riesgos (8am - 6pm) ---
+  detection-service:
+    build:
+      context: ./risk_detection
+      dockerfile: Dockerfile
+    container_name: risk-detector-service
+    env_file: C:/Users/castrcr/OneDrive - SierraCol Energy/Documents/llanos_computervision/sierracol-risk-detection-computervision/.env
+    # --- Configuración de Red para la Baliza ---
+    # "host" compartiria la red del Windows Server con el contenedor. Esencial para que el contenedor pueda acceder a IP de la red local como la baliza (192.168.1.101).
+    network_mode: "host"
+    # --- Despliegue con GPU (NVIDIA) ---
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    # --- Volúmenes (Carpetas Compartidas) ---
+    volumes:
+      - ./logs:/app/logs
+      - ./risk_clips:/app/risk_clips
+      - ./risk_detection/trained_model:/app/trained_model:ro
+      - ./risk_detection/videos:/app/videos:ro # Lo usamos para pruebas, con rtsp se elimina
+    # Asegura que se reinicie si falla
+    restart: always
+
+  # --- Servicio de Programación y Carga (7pm) ---
+  scheduler-service:
+    build:
+      context: ./upload_data
+      dockerfile: Dockerfile
+    container_name: risk-uploader-scheduler
+    env_file: C:/Users/castrcr/OneDrive - SierraCol Energy/Documents/llanos_computervision/sierracol-risk-detection-computervision/.env
+    volumes:
+      - ./logs:/app/logs
+      - ./config_data:/app/config_data:ro
+      - ./risk_clips:/app/risk_clips
+    # Asegura que se reinicie si falla
+    restart: always

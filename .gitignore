@@ -1,3 +1,21 @@
+#Source
+*.mp4
+tests.ipynb
+
+risk_detection/risk_clips/*
+!risk_detection/risk_clips/
+
+risk_detection/logs/*
+!risk_detection/logs/
+
+risk_detection/trained_model/*
+!risk_detection/trained_model/
+
+risk_detection/videos/*
+!risk_detection/videos/
+
+mano_safata2.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

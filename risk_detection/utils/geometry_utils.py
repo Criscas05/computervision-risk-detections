@@ -29,6 +29,7 @@ def point_in_or_touch_poly(point_xy, poly: Polygon):
 
 def feet_distance_to_geom(feet_points, geom, thresh):
     for x, y in feet_points:
+        # print(Point(x, y).distance(geom))
         if Point(x, y).distance(geom) <= thresh:
             return True
     return False

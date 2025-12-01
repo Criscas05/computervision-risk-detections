@@ -4,3 +4,7 @@ torch
 torchvision
 supervision
 shapely
+python-dotenv
+pytz
+psutil
+pynvml

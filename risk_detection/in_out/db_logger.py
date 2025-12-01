@@ -5,6 +5,7 @@ import json
 import time
 import os
 from datetime import datetime
+import pytz
 
 # La cola que comunica el hilo principal (CV) con el hilo de la BBDD
 data_queue = queue.Queue()
@@ -33,7 +34,8 @@ class DBLogger:
                     timestamp TEXT,
                     scene_name TEXT,
                     scene_active BOOLEAN,
-                    risk_active BOOLEAN
+                    risk_active BOOLEAN,
+                    video_file TEXT
                 )
             """)
             conn.commit()
@@ -52,15 +54,15 @@ class DBLogger:
                     # print(f"DB Worker escribiendo en hilo: {threading.current_thread().name}")
                     # time.sleep(3)
                     # Desempaquetamos los datos que envía el hilo principal
-                    (scene_name, ts, scene_active, risk_active) = data
+                    (scene_name, ts, scene_active, risk_active, video_file) = data
                     
                     # Convertimos los datos para un almacenamiento seguro
                     ts_str = str(ts)  # Convertimos timestamp/datetime a string
 
                     # Insertamos en la base de datos
                     cursor.execute(
-                        "INSERT INTO riesgos (timestamp, scene_name, scene_active, risk_active) VALUES (?, ?, ?, ?)",
-                        (ts_str, scene_name, scene_active, risk_active)
+                        "INSERT INTO riesgos (timestamp, scene_name, scene_active, risk_active, video_file) VALUES (?, ?, ?, ?, ?)",
+                        (ts_str, scene_name, scene_active, risk_active, video_file)
                     )
                     
                     # Hacemos commit de la transacción
@@ -88,8 +90,9 @@ class DBLogger:
         os.makedirs(output_dir, exist_ok=True)
         
         # Crear un nombre de archivo único por día
-        today = datetime.now().strftime('%Y-%m-%d')
-        db_path = os.path.join(output_dir, f"registros_riesgos_{today}.db")
+        bogota = pytz.timezone("America/Bogota")
+        today = datetime.now(bogota).strftime('%Y-%m-%d')
+        db_path = os.path.join(output_dir, f"registros_riesgos.db")
         
         # Iniciamos el hilo worker
         # 'daemon=True' asegura que el hilo se cierre si el script principal falla
@@ -100,13 +103,13 @@ class DBLogger:
         return db_path
 
 
-    def log_event(self, scene_name: str, ts, scene_active: bool, risk_active: bool):
+    def log_event(self, scene_name: str, ts, scene_active: bool, risk_active: bool, video_file: str):
         """
         Esta es la función que tu hilo principal llamará.
         Es súper rápida porque solo pone datos en una cola (RAM).
         """
         try:
-            data = (scene_name, ts, scene_active, risk_active)
+            data = (scene_name, ts, scene_active, risk_active, video_file)
             # data_queue.put_nowait(data) # Opción si no quieres bloquear nunca
             data_queue.put(data) # .put() es seguro y rápido
         except Exception as e:

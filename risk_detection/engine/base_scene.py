@@ -7,8 +7,9 @@
 # ============================================================
 
 from abc import ABC, abstractmethod
+from datetime import datetime
 import time
-import datetime
+import pytz
 
 class BaseScene(ABC):
     """
@@ -34,7 +35,8 @@ class BaseScene(ABC):
         self.heights_stickout = []
         self.t0 = None
 
-        self.logs_enabled = True 
+        self.logs_enabled = True
+        self.bogota = pytz.timezone("America/Bogota")
 
     # ============================================================
     # Métodos principales a implementar
@@ -126,7 +128,7 @@ class BaseScene(ABC):
 
     def make_result(self, scene: bool, risk: bool, extras: dict = None):
         """Devuelve el formato de salida estándar para el motor."""
-        ts = datetime.datetime.now().isoformat()
+        ts = datetime.now(self.bogota).isoformat()
         return {
             "time": ts,
             "scene": bool(scene),

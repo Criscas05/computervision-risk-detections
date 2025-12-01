@@ -72,7 +72,7 @@ class TubularPendulando(BaseScene):
                 self.deactivate_risk()
 
             if frame is not None and self.cfg.VISUALIZE:
-                cv2.line(frame, (x_linea_vertical, 0), (x_linea_vertical, self.cfg.RESIZE[1]), (255,0,255), 2)
+                # cv2.line(frame, (x_linea_vertical, 0), (x_linea_vertical, self.cfg.RESIZE[1]), (255,0,255), 2)
                 draw_polygon(frame, poly_np, active=self.risk_active)
 
         # print(f"Escena activa: {self.scene_active}, Riesgo activo: {self.risk_active}, Frames positivos: {self.risk_active_pos}, Frames_negativos: {self.risk_active_neg}")
